@@ -1,0 +1,8 @@
+spotify_pipeline:
+  target: dev
+  outputs:
+    # Local, file-based warehouse: no server, no credentials, free.
+    dev:
+      type: duckdb
+      path: "{{ env_var('COPILOT_DUCKDB_PATH', 'warehouse.duckdb') }}"
+      threads: 4

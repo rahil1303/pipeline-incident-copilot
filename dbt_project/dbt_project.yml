@@ -1,0 +1,36 @@
+name: spotify_pipeline
+version: "0.1.0"
+config-version: 2
+
+profile: spotify_pipeline
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  spotify_pipeline:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table
+
+vars:
+  dbt_schema_aware_pipeline:
+    contracts:
+      stg_tracks:
+        danceability: {type: bounded_float, min: 0.0, max: 1.0}
+        energy: {type: bounded_float, min: 0.0, max: 1.0}
+        loudness: {type: bounded_float, min: -60.0, max: 0.0}
+        speechiness: {type: bounded_float, min: 0.0, max: 1.0}
+        acousticness: {type: bounded_float, min: 0.0, max: 1.0}
+        instrumentalness: {type: bounded_float, min: 0.0, max: 1.0}
+        liveness: {type: bounded_float, min: 0.0, max: 1.0}
+        valence: {type: bounded_float, min: 0.0, max: 1.0}
+        tempo: {type: bounded_float, min: 50.0, max: 250.0}
+        popularity: {type: bounded_float, min: 0.0, max: 100.0}

@@ -1,0 +1,568 @@
+{
+  "provider": "baseline",
+  "models": [
+    "rules"
+  ],
+  "timestamp": "2026-11-17T01:05:09",
+  "n": 20,
+  "metrics": {
+    "fully_correct": 0.5,
+    "category_accuracy": 0.75,
+    "node_accuracy": 0.7,
+    "column_accuracy": 0.8,
+    "parse_rate": 1.0,
+    "latency_mean_s": 0.0,
+    "latency_max_s": 0.0,
+    "prompt_tokens_total": null,
+    "completion_tokens_total": null
+  },
+  "per_category_fully_correct": {
+    "out_of_range": 0.6,
+    "null_values": 0.667,
+    "schema_drift": 0.5,
+    "type_mismatch": 0.333,
+    "sql_logic_error": 0.4
+  },
+  "rows": [
+    {
+      "scenario_id": "drift_artists_renamed",
+      "label": {
+        "category": "schema_drift",
+        "root_cause_node": "raw_tracks",
+        "column": "artists"
+      },
+      "diagnosis": {
+        "category": "schema_drift",
+        "root_cause_node": "raw_tracks",
+        "column": "artists",
+        "explanation": "column missing from source, no code changes",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0001,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "drift_energy_renamed",
+      "label": {
+        "category": "schema_drift",
+        "root_cause_node": "raw_tracks",
+        "column": "energy"
+      },
+      "diagnosis": {
+        "category": "schema_drift",
+        "root_cause_node": "raw_tracks",
+        "column": "energy",
+        "explanation": "column missing from source, no code changes",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "drift_tempo_renamed",
+      "label": {
+        "category": "schema_drift",
+        "root_cause_node": "raw_tracks",
+        "column": "tempo"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "stg_tracks",
+        "column": "tempo",
+        "explanation": "missing column and the model code changed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": false,
+      "node_correct": false,
+      "column_correct": true,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "drift_valence_dropped",
+      "label": {
+        "category": "schema_drift",
+        "root_cause_node": "raw_tracks",
+        "column": "valence"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "int_tracks_enriched",
+        "column": "valence",
+        "explanation": "missing column and the model code changed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": false,
+      "node_correct": false,
+      "column_correct": true,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "null_danceability",
+      "label": {
+        "category": "null_values",
+        "root_cause_node": "raw_tracks",
+        "column": "danceability"
+      },
+      "diagnosis": {
+        "category": "null_values",
+        "root_cause_node": "raw_tracks",
+        "column": "danceability",
+        "explanation": "not_null failed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "null_energy_small",
+      "label": {
+        "category": "null_values",
+        "root_cause_node": "raw_tracks",
+        "column": "energy"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "mart_top_artists",
+        "column": "energy",
+        "explanation": "test failed after a code change",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": false,
+      "node_correct": false,
+      "column_correct": true,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "null_popularity",
+      "label": {
+        "category": "null_values",
+        "root_cause_node": "raw_tracks",
+        "column": "popularity"
+      },
+      "diagnosis": {
+        "category": "null_values",
+        "root_cause_node": "raw_tracks",
+        "column": "popularity",
+        "explanation": "completeness_above failed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "oor_acousticness_sentinel",
+      "label": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "acousticness"
+      },
+      "diagnosis": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "acousticness",
+        "explanation": "in_range failed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "oor_energy_percent",
+      "label": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "energy"
+      },
+      "diagnosis": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "energy",
+        "explanation": "in_range failed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "oor_loudness_sign_flip",
+      "label": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "loudness"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "int_tracks_enriched",
+        "column": "loudness",
+        "explanation": "test failed after a code change",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": false,
+      "node_correct": false,
+      "column_correct": true,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "oor_popularity_overflow",
+      "label": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "popularity"
+      },
+      "diagnosis": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "popularity",
+        "explanation": "in_range failed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "oor_valence_partial_scale",
+      "label": {
+        "category": "out_of_range",
+        "root_cause_node": "raw_tracks",
+        "column": "valence"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "mart_top_artists",
+        "column": "valence",
+        "explanation": "test failed after a code change",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": false,
+      "node_correct": false,
+      "column_correct": true,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "sql_abs_loudness",
+      "label": {
+        "category": "sql_logic_error",
+        "root_cause_node": "stg_tracks",
+        "column": "loudness"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "mart_top_artists",
+        "column": "loudness",
+        "explanation": "test failed after a code change",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": false,
+      "column_correct": true,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "sql_energy_rescaled_in_staging",
+      "label": {
+        "category": "sql_logic_error",
+        "root_cause_node": "stg_tracks",
+        "column": "energy"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "stg_tracks",
+        "column": "energy",
+        "explanation": "test failed after a code change",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "sql_mart_column_typo",
+      "label": {
+        "category": "sql_logic_error",
+        "root_cause_node": "mart_top_artists",
+        "column": "artist_names"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "mart_top_artists",
+        "column": "artist_name",
+        "explanation": "missing column and the model code changed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": false,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "sql_removed_tempo_filter",
+      "label": {
+        "category": "sql_logic_error",
+        "root_cause_node": "stg_tracks",
+        "column": "tempo"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "stg_tracks",
+        "column": "tempo",
+        "explanation": "test failed after a code change",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "sql_typo_valence",
+      "label": {
+        "category": "sql_logic_error",
+        "root_cause_node": "int_tracks_enriched",
+        "column": "valence"
+      },
+      "diagnosis": {
+        "category": "sql_logic_error",
+        "root_cause_node": "int_tracks_enriched",
+        "column": "valance",
+        "explanation": "missing column and the model code changed",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": false,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "type_duration_suffix",
+      "label": {
+        "category": "type_mismatch",
+        "root_cause_node": "raw_tracks",
+        "column": "duration_ms"
+      },
+      "diagnosis": {
+        "category": "type_mismatch",
+        "root_cause_node": "raw_tracks",
+        "column": null,
+        "explanation": "type conversion error",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": false,
+      "fully_correct": false
+    },
+    {
+      "scenario_id": "type_popularity_text",
+      "label": {
+        "category": "type_mismatch",
+        "root_cause_node": "raw_tracks",
+        "column": "popularity"
+      },
+      "diagnosis": {
+        "category": "type_mismatch",
+        "root_cause_node": "raw_tracks",
+        "column": "popularity",
+        "explanation": "type conversion error",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": true,
+      "fully_correct": true
+    },
+    {
+      "scenario_id": "type_tempo_units",
+      "label": {
+        "category": "type_mismatch",
+        "root_cause_node": "raw_tracks",
+        "column": "tempo"
+      },
+      "diagnosis": {
+        "category": "type_mismatch",
+        "root_cause_node": "raw_tracks",
+        "column": null,
+        "explanation": "type conversion error",
+        "suggested_fix": "",
+        "confidence": null,
+        "provider": "baseline",
+        "model": "rules",
+        "latency_s": 0.0,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "parse_ok": true,
+        "raw": ""
+      },
+      "category_correct": true,
+      "node_correct": true,
+      "column_correct": false,
+      "fully_correct": false
+    }
+  ]
+}

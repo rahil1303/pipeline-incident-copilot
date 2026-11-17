@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: stg_tracks
+    description: Cleaned and typed Spotify track data with quality contracts applied.
+    columns:
+      - name: track_id
+        description: "Spotify track ID. Not unique at row level (same track appears once per genre)."
+        tests:
+          - not_null
+
+      - name: track_name
+        tests:
+          - not_null
+
+      - name: danceability
+        tests:
+          - not_null
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: 0.0
+                max_value: 1.0
+
+      - name: energy
+        tests:
+          - not_null
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: 0.0
+                max_value: 1.0
+
+      - name: loudness
+        tests:
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: -50.0
+                max_value: 5.0
+
+      - name: tempo
+        tests:
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: 1.0
+                max_value: 250.0
+
+      - name: valence
+        tests:
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: 0.0
+                max_value: 1.0
+
+      - name: acousticness
+        tests:
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: 0.0
+                max_value: 1.0
+
+      - name: popularity
+        tests:
+          - dbt_schema_aware_pipeline.completeness_above:
+              arguments:
+                threshold: 0.99
+          - dbt_schema_aware_pipeline.in_range:
+              arguments:
+                min_value: 0
+                max_value: 100

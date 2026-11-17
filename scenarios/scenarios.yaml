@@ -1,0 +1,179 @@
+# Labelled incident scenarios.
+#
+# Each scenario breaks a fresh copy of the pipeline (dbt_project/) in a known
+# way, so the copilot's diagnosis can be scored against ground truth.
+#
+#   faults:       what actually goes wrong (data delivery or code change)
+#   distractors:  harmless code edits, because real incidents never come with
+#                 a clean git history. They must not change pipeline behaviour.
+#   label:        category (see incident_copilot/schemas.py), the node where the
+#                 root cause lives (raw_tracks = upstream data), and the column.
+
+common_distractors:
+  mart_comment: &mart_comment
+    type: replace_in_model
+    model: mart_top_artists
+    old: "with enriched as ("
+    new: "-- TODO: add genre breakdown per artist\nwith enriched as ("
+  stg_lowercase: &stg_lowercase
+    type: replace_in_model
+    model: stg_tracks
+    old: "AND tempo > 0"
+    new: "and tempo > 0"
+  int_comment: &int_comment
+    type: replace_in_model
+    model: int_tracks_enriched
+    old: "with tracks as ("
+    new: "-- mood quadrants follow Russell's circumplex model\nwith tracks as ("
+
+scenarios:
+  # ------------------------------------------------------------ out_of_range
+  - id: oor_energy_percent
+    description: Upstream export switched energy from a 0-1 score to a percentage.
+    faults:
+      - {type: scale_column, column: energy, factor: 100}
+    label: {category: out_of_range, root_cause_node: raw_tracks, column: energy}
+
+  - id: oor_popularity_overflow
+    description: A small batch of tracks arrives with popularity 150.
+    faults:
+      - {type: set_value, column: popularity, value: 150, fraction: 0.03}
+    label: {category: out_of_range, root_cause_node: raw_tracks, column: popularity}
+
+  - id: oor_valence_partial_scale
+    description: One upstream partition scaled valence by 10; the rest are fine.
+    faults:
+      - {type: scale_column, column: valence, factor: 10, fraction: 0.2}
+    distractors: [*mart_comment]
+    label: {category: out_of_range, root_cause_node: raw_tracks, column: valence}
+
+  - id: oor_acousticness_sentinel
+    description: Missing acousticness encoded as -1 sentinel by the producer.
+    faults:
+      - {type: set_value, column: acousticness, value: -1, fraction: 0.05}
+    label: {category: out_of_range, root_cause_node: raw_tracks, column: acousticness}
+
+  - id: oor_loudness_sign_flip
+    description: Producer now exports loudness as positive attenuation instead of negative dB.
+    faults:
+      - {type: negate_column, column: loudness}
+    distractors: [*int_comment]
+    label: {category: out_of_range, root_cause_node: raw_tracks, column: loudness}
+
+  # ------------------------------------------------------------ null_values
+  - id: null_danceability
+    description: Feature extraction job timed out for 10% of tracks.
+    faults:
+      - {type: null_column, column: danceability, fraction: 0.1}
+    label: {category: null_values, root_cause_node: raw_tracks, column: danceability}
+
+  - id: null_energy_small
+    description: A handful of tracks arrive without energy.
+    faults:
+      - {type: null_column, column: energy, fraction: 0.02}
+    distractors: [*mart_comment]
+    label: {category: null_values, root_cause_node: raw_tracks, column: energy}
+
+  - id: null_popularity
+    description: Popularity enrichment API was down for part of the load.
+    faults:
+      - {type: null_column, column: popularity, fraction: 0.05}
+    label: {category: null_values, root_cause_node: raw_tracks, column: popularity}
+
+  # ------------------------------------------------------------ schema_drift
+  - id: drift_energy_renamed
+    description: Producer renamed energy to energy_score.
+    faults:
+      - {type: rename_column, old: energy, new: energy_score}
+    label: {category: schema_drift, root_cause_node: raw_tracks, column: energy}
+
+  - id: drift_valence_dropped
+    description: Producer dropped the valence column from the export.
+    faults:
+      - {type: drop_column, column: valence}
+    distractors: [*int_comment]
+    label: {category: schema_drift, root_cause_node: raw_tracks, column: valence}
+
+  - id: drift_tempo_renamed
+    description: Producer renamed tempo to bpm.
+    faults:
+      - {type: rename_column, old: tempo, new: bpm}
+    distractors: [*stg_lowercase]
+    label: {category: schema_drift, root_cause_node: raw_tracks, column: tempo}
+
+  - id: drift_artists_renamed
+    description: Producer renamed artists to artist_name.
+    faults:
+      - {type: rename_column, old: artists, new: artist_name}
+    label: {category: schema_drift, root_cause_node: raw_tracks, column: artists}
+
+  # ------------------------------------------------------------ type_mismatch
+  - id: type_tempo_units
+    description: Some tempo values now arrive as strings with units, e.g. '120.5 bpm'.
+    faults:
+      - {type: stringify_column, column: tempo, template: "{v} bpm", fraction: 0.3}
+    distractors: [*stg_lowercase]
+    label: {category: type_mismatch, root_cause_node: raw_tracks, column: tempo}
+
+  - id: type_popularity_text
+    description: Popularity sometimes arrives as the literal string 'unknown'.
+    faults:
+      - {type: set_value, column: popularity, value: unknown, fraction: 0.05}
+    label: {category: type_mismatch, root_cause_node: raw_tracks, column: popularity}
+
+  - id: type_duration_suffix
+    description: duration_ms values arrive with an 'ms' suffix.
+    faults:
+      - {type: stringify_column, column: duration_ms, template: "{v}ms", fraction: 1.0}
+    distractors: [*mart_comment]
+    label: {category: type_mismatch, root_cause_node: raw_tracks, column: duration_ms}
+
+  # ------------------------------------------------------------ sql_logic_error
+  - id: sql_typo_valence
+    description: Commit introduced a typo (valance) in the mood quadrant logic.
+    faults:
+      - type: replace_in_model
+        model: int_tracks_enriched
+        old: "when energy >= 0.5 and valence >= 0.5"
+        new: "when energy >= 0.5 and valance >= 0.5"
+    label: {category: sql_logic_error, root_cause_node: int_tracks_enriched, column: valence}
+
+  - id: sql_removed_tempo_filter
+    description: >
+      Commit removed the tempo > 0 guard in staging. The source has always had a
+      few zero-tempo tracks (spoken word, silence), which now leak through.
+    faults:
+      - {type: set_value, column: tempo, value: 0, fraction: 0.02}
+      - type: replace_in_model
+        model: stg_tracks
+        old: "\n      AND tempo > 0"
+        new: ""
+    label: {category: sql_logic_error, root_cause_node: stg_tracks, column: tempo}
+
+  - id: sql_mart_column_typo
+    description: Commit references artist_name instead of artist_names in the artists mart.
+    faults:
+      - type: replace_in_model
+        model: mart_top_artists
+        old: "        artist_names,"
+        new: "        artist_name,"
+    label: {category: sql_logic_error, root_cause_node: mart_top_artists, column: artist_names}
+
+  - id: sql_energy_rescaled_in_staging
+    description: Commit 'normalises' energy to a percentage in staging, breaking the 0-1 contract.
+    faults:
+      - type: replace_in_model
+        model: stg_tracks
+        old: "        energy,"
+        new: "        energy * 100                                    as energy,"
+    label: {category: sql_logic_error, root_cause_node: stg_tracks, column: energy}
+
+  - id: sql_abs_loudness
+    description: Commit wraps loudness in abs(), making every value positive.
+    faults:
+      - type: replace_in_model
+        model: stg_tracks
+        old: "        loudness,"
+        new: "        abs(loudness)                                   as loudness,"
+    distractors: [*mart_comment]
+    label: {category: sql_logic_error, root_cause_node: stg_tracks, column: loudness}

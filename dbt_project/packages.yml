@@ -1,0 +1,4 @@
+packages:
+  # Data quality contracts (in_range, completeness_above, no_sudden_spikes)
+  - git: "https://github.com/rahil1303/dbt_schema_aware_pipeline.git"
+    revision: d425bd851d75b42a2c3e3ab041489a2bb2e52455

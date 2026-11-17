@@ -1,0 +1,72 @@
+{
+  "scenario_id": "sql_mart_column_typo",
+  "dbt_exit_code": 1,
+  "dbt_build_seconds": 4.7,
+  "evidence": {
+    "run_summary": {
+      "success": 4,
+      "pass": 12,
+      "error": 1
+    },
+    "failures": [
+      {
+        "node": "mart_top_artists",
+        "resource_type": "model",
+        "status": "error",
+        "message": "Runtime Error in model mart_top_artists (models/marts/mart_top_artists.sql) Binder Error: Referenced column \"artist_name\" not found in FROM clause! Candidate bindings: \"artist_names\", \"track_name\", \"album_name\", \"time_signature\", \"duration_ms\" LINE 15: max(popularity) as peak_pop... ^^^^^^^^^^^",
+        "compiled_sql": "with enriched as (\nselect * from \"warehouse\".\"main\".\"int_tracks_enriched\"\n),\nartist_stats as (\nselect\nartist_name,\ncount(*) as total_tracks,\nround(avg(popularity)::numeric, 1) as avg_popularity,\nmax(popularity) as peak_popularity,\nround(avg(danceability)::numeric, 3) as avg_danceability,\nround(avg(energy)::numeric, 3) as avg_energy,\nround(avg(valence)::numeric, 3) as avg_valence,\ncount(case when is_explicit then 1 end) as explicit_track_count,\nround(avg(duration_minutes)::numeric, 2) as avg_track_duration_minutes\nfrom enriched\ngroup by 1\n)\nselect * from artist_stats\norder by avg_popularity desc"
+      }
+    ],
+    "skipped_downstream": {
+      "models": [],
+      "tests": 0
+    },
+    "lineage": {
+      "int_tracks_enriched": [
+        "stg_tracks"
+      ],
+      "mart_audio_feature_summary": [
+        "int_tracks_enriched"
+      ],
+      "mart_top_artists": [
+        "int_tracks_enriched"
+      ],
+      "stg_tracks": [
+        "raw_tracks"
+      ],
+      "raw_tracks": []
+    },
+    "recent_code_changes": "--- a/models/marts/mart_top_artists.sql\n+++ b/models/marts/mart_top_artists.sql\n@@ -6,3 +6,3 @@\n     select\n-        artist_names,\n+        artist_name,\n         count(*)                                        as total_tracks,\n",
+    "source_profile": {
+      "table": "raw_tracks",
+      "row_count": 600,
+      "columns": [
+        "track_id VARCHAR nulls=0 samples=[\"Aq7mmkN0TI7fm1fteXiH3N\", \"FbkDR0ht3DR3KTHgDqtiYX\", \"579T3YHJbgla6moPRIQmLi\"]",
+        "artists VARCHAR nulls=0 samples=[\"Light Rain\", \"River Road\", \"Road Road\"]",
+        "album_name VARCHAR nulls=0 samples=[\"Heart Storm\", \"Light Rain\", \"Dream Glass\"]",
+        "track_name VARCHAR nulls=0 samples=[\"Summer Silver\", \"Fire City\", \"Shadow\"]",
+        "popularity INTEGER nulls=0 range=[0, 100]",
+        "duration_ms INTEGER nulls=0 range=[90040, 419547]",
+        "explicit BOOLEAN nulls=0",
+        "danceability DOUBLE nulls=0 range=[0.021, 0.992]",
+        "energy DOUBLE nulls=0 range=[0.034, 0.972]",
+        "key INTEGER nulls=0 range=[0, 11]",
+        "loudness DOUBLE nulls=0 range=[-28.641, -0.5]",
+        "mode INTEGER nulls=0 range=[0, 1]",
+        "speechiness DOUBLE nulls=0 range=[0.0005, 0.4783]",
+        "acousticness DOUBLE nulls=0 range=[0.0028, 0.9742]",
+        "instrumentalness DOUBLE nulls=0 range=[0.0, 0.7312]",
+        "liveness DOUBLE nulls=0 range=[0.0018, 0.7083]",
+        "valence DOUBLE nulls=0 range=[0.015, 0.993]",
+        "tempo DOUBLE nulls=0 range=[60.66, 199.966]",
+        "time_signature INTEGER nulls=0 range=[3, 5]",
+        "track_genre VARCHAR nulls=0 samples=[\"acoustic\", \"metal\", \"hip-hop\"]"
+      ]
+    }
+  },
+  "label": {
+    "category": "sql_logic_error",
+    "root_cause_node": "mart_top_artists",
+    "column": "artist_names"
+  }
+}

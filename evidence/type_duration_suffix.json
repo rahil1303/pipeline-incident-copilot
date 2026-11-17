@@ -1,0 +1,76 @@
+{
+  "scenario_id": "type_duration_suffix",
+  "dbt_exit_code": 1,
+  "dbt_build_seconds": 4.91,
+  "evidence": {
+    "run_summary": {
+      "success": 2,
+      "pass": 12,
+      "error": 1,
+      "skipped": 2
+    },
+    "failures": [
+      {
+        "node": "int_tracks_enriched",
+        "resource_type": "model",
+        "status": "error",
+        "message": "Runtime Error in model int_tracks_enriched (models/intermediate/int_tracks_enriched.sql) Binder Error: No function matches the given name and argument types '/(VARCHAR, DECIMAL(6,1))'. You might need to add explicit type casts. Candidate functions: \"/\"(\"left\" FLOAT, \"right\" FLOAT, /) -> FLOAT \"/\"(\"left\" DOUBLE, \"right\" DOUBLE, /) -> DOUBLE \"/\"(\"left\" INTERVAL, \"right\" DOUBLE, /) -> INTERVAL LINE 12: when energy >= 0.5 and valence < 0.5 then 'Angry/Turbulent' ^^^^^^^^^^^^^^^^^^^^^",
+        "compiled_sql": "with tracks as (\nselect * from \"warehouse\".\"main\".\"stg_tracks\"\n),\nenriched as (\nselect\n*,\nround(duration_ms / 60000.0, 2) as duration_minutes,\ncase\nwhen energy >= 0.5 and valence >= 0.5 then 'Happy/Energetic'\nwhen energy >= 0.5 and valence < 0.5 then 'Angry/Turbulent'\nwhen energy < 0.5 and valence >= 0.5 then 'Chill/Peaceful'\nelse 'Sad/Melancholic'\nend as mood_quadrant,\ncase\nwhen popularity >= 80 then 'viral'\nwhen popularity >= 60 then 'popular'\nwhen popularity >= 40 then 'moderate'\nelse 'niche'\nend as popularity_tier,\ncase\nwhen danceability >= 0.75 then 'high'\nwhen danceability >= 0.4 then 'medium'\nelse 'low'\nend as danceability_bucket\nfrom tracks\n)\nselect * from enriched"
+      }
+    ],
+    "skipped_downstream": {
+      "models": [
+        "mart_top_artists",
+        "mart_audio_feature_summary"
+      ],
+      "tests": 0
+    },
+    "lineage": {
+      "int_tracks_enriched": [
+        "stg_tracks"
+      ],
+      "mart_audio_feature_summary": [
+        "int_tracks_enriched"
+      ],
+      "mart_top_artists": [
+        "int_tracks_enriched"
+      ],
+      "stg_tracks": [
+        "raw_tracks"
+      ],
+      "raw_tracks": []
+    },
+    "recent_code_changes": "--- a/models/marts/mart_top_artists.sql\n+++ b/models/marts/mart_top_artists.sql\n@@ -1 +1,2 @@\n+-- TODO: add genre breakdown per artist\n with enriched as (\n",
+    "source_profile": {
+      "table": "raw_tracks",
+      "row_count": 600,
+      "columns": [
+        "track_id VARCHAR nulls=0 samples=[\"Aq7mmkN0TI7fm1fteXiH3N\", \"FbkDR0ht3DR3KTHgDqtiYX\", \"579T3YHJbgla6moPRIQmLi\"]",
+        "artists VARCHAR nulls=0 samples=[\"Light Rain\", \"River Road\", \"Road Road\"]",
+        "album_name VARCHAR nulls=0 samples=[\"Heart Storm\", \"Light Rain\", \"Dream Glass\"]",
+        "track_name VARCHAR nulls=0 samples=[\"Summer Silver\", \"Fire City\", \"Shadow\"]",
+        "popularity INTEGER nulls=0 range=[0, 100]",
+        "duration_ms VARCHAR nulls=0 samples=[\"274117ms\", \"397130ms\", \"145718ms\"]",
+        "explicit BOOLEAN nulls=0",
+        "danceability DOUBLE nulls=0 range=[0.021, 0.992]",
+        "energy DOUBLE nulls=0 range=[0.034, 0.972]",
+        "key INTEGER nulls=0 range=[0, 11]",
+        "loudness DOUBLE nulls=0 range=[-28.641, -0.5]",
+        "mode INTEGER nulls=0 range=[0, 1]",
+        "speechiness DOUBLE nulls=0 range=[0.0005, 0.4783]",
+        "acousticness DOUBLE nulls=0 range=[0.0028, 0.9742]",
+        "instrumentalness DOUBLE nulls=0 range=[0.0, 0.7312]",
+        "liveness DOUBLE nulls=0 range=[0.0018, 0.7083]",
+        "valence DOUBLE nulls=0 range=[0.015, 0.993]",
+        "tempo DOUBLE nulls=0 range=[60.66, 199.966]",
+        "time_signature INTEGER nulls=0 range=[3, 5]",
+        "track_genre VARCHAR nulls=0 samples=[\"acoustic\", \"metal\", \"hip-hop\"]"
+      ]
+    }
+  },
+  "label": {
+    "category": "type_mismatch",
+    "root_cause_node": "raw_tracks",
+    "column": "duration_ms"
+  }
+}

@@ -1,0 +1,5 @@
+packages:
+  - git: https://github.com/rahil1303/dbt_schema_aware_pipeline.git
+    name: dbt_schema_aware_pipeline
+    revision: d425bd851d75b42a2c3e3ab041489a2bb2e52455
+sha1_hash: daa19801a2a8a51cdb96a059f95d7c9bc7062da5
