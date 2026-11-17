@@ -81,8 +81,10 @@ def cmd_eval(a: argparse.Namespace) -> int:
         _, md = write_report(report, Path(a.out))
         m = report["metrics"]
         print(f"   fully correct {m['fully_correct']:.0%} | category {m['category_accuracy']:.0%} | "
-              f"mean latency {m['latency_mean_s']}s  ->  {md}")
-        worst = min(worst, m["fully_correct"] or 0.0)
+              f"mean latency {m['latency_mean_s']}s | tokens {m['prompt_tokens_total']} in / "
+              f"{m['completion_tokens_total']} out  ->  {md}")
+        if provider != "baseline":  # the baseline is a reference point, not something we ship
+            worst = min(worst, m["fully_correct"] or 0.0)
     if a.min_accuracy is not None and worst < a.min_accuracy:
         print(f"\nEval gate FAILED: {worst:.0%} < required {a.min_accuracy:.0%}")
         return 2

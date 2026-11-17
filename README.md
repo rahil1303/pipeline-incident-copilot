@@ -29,11 +29,13 @@ The pipeline under test is the Spotify reference implementation from [dbt_schema
 | Approach | Fully correct | Category | Notes |
 |---|---|---|---|
 | Rule-based baseline | 50% | 75% | Reads error messages well; blames any code change, harmless or not |
-| Groq `openai/gpt-oss-120b` | _run `copilot eval --provider groq`_ | | |
+| Groq `openai/gpt-oss-120b` (free tier) | **90%** | **95%** | ~1.1 s per diagnosis; ignores harmless edits, separates bad data from bad commits |
 | Gemini `gemini-2.5-flash` | _run `copilot eval --provider gemini`_ | | |
 | Ollama `llama3.1:8b` (local) | _run `copilot eval --provider ollama`_ | | |
 
 *Fully correct* means category, root-cause node and column all match the label. Full per-scenario reports are written to `reports/`.
+
+The LLM fixed every case where the baseline was fooled by an unrelated code edit. Its two misses are instructive: it read a failed completeness check on `popularity` as an out-of-range problem, and for a typo in a mart it reported the misspelled column instead of the intended one.
 
 ## Incident categories
 
