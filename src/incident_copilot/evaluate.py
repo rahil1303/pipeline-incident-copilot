@@ -48,6 +48,8 @@ def run_eval(provider: str, evidence_dir: Path, only: list[str] | None = None,
             mark = "OK " if s["fully_correct"] else ("~  " if s["category_correct"] else "X  ")
             print(f"  {mark}{b['scenario_id']:34} -> {d.category or 'ERROR'} @ "
                   f"{d.root_cause_node or '-'} [{d.column}]  {d.latency_s:.2f}s", flush=True)
+            if not d.parse_ok:
+                print(f"       reason: {' '.join(d.raw.split())[:300]}", flush=True)
     return summarise(provider, rows)
 
 
