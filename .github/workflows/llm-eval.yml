@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       provider:
-        description: "Provider spec, e.g. groq, groq:llama-3.1-8b-instant, groq,gemini"
+        description: "Provider spec, e.g. groq, groq:openai/gpt-oss-20b, groq,gemini"
         default: groq
   pull_request:
     paths:

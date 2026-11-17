@@ -8,7 +8,7 @@ HTTP client covers them all; only base URL, key and model differ.
     openrouter  ':free' models                OPENROUTER_API_KEY
     ollama      local models, unlimited       (no key; needs `ollama serve`)
 
-Spec strings: "groq", "groq:llama-3.1-8b-instant", "ollama:qwen2.5:7b".
+Spec strings: "groq", "groq:openai/gpt-oss-20b", "ollama:qwen2.5:7b".
 A comma-separated list ("groq,gemini,ollama") builds a fallback chain: free
 tiers rate-limit and occasionally retire models, so the agent moves on to the
 next provider instead of failing.
@@ -27,25 +27,30 @@ PRESETS: dict[str, dict[str, str | None]] = {
         "base_url": "https://api.groq.com/openai/v1",
         "key_env": "GROQ_API_KEY",
         "model_env": "GROQ_MODEL",
-        "default_model": "llama-3.3-70b-versatile",
+        "default_model": "openai/gpt-oss-120b",
+        # Free tier allows ~8k tokens/min; one diagnosis is ~2k tokens incl. reasoning.
+        "min_interval_s": "15",
     },
     "gemini": {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
         "key_env": "GEMINI_API_KEY",
         "model_env": "GEMINI_MODEL",
         "default_model": "gemini-2.5-flash",
+        "min_interval_s": "5",
     },
     "openrouter": {
         "base_url": "https://openrouter.ai/api/v1",
         "key_env": "OPENROUTER_API_KEY",
         "model_env": "OPENROUTER_MODEL",
         "default_model": "meta-llama/llama-3.3-70b-instruct:free",
+        "min_interval_s": "4",
     },
     "ollama": {
         "base_url": os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1"),
         "key_env": None,
         "model_env": "OLLAMA_MODEL",
         "default_model": "llama3.1:8b",
+        "min_interval_s": "0",
     },
 }
 
@@ -169,5 +174,5 @@ def make_provider(spec: str) -> Provider:
         key = os.environ.get(preset["key_env"])
         if not key:
             raise ProviderError(f"{preset['key_env']} is not set (see .env.example)")
-    interval = float(os.environ.get("COPILOT_MIN_INTERVAL_S", "2.5" if name != "ollama" else "0"))
+    interval = float(os.environ.get("COPILOT_MIN_INTERVAL_S") or preset.get("min_interval_s") or 0)
     return OpenAICompatible(name, preset["base_url"], model, key, min_interval_s=interval)

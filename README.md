@@ -29,7 +29,7 @@ The pipeline under test is the Spotify reference implementation from [dbt_schema
 | Approach | Fully correct | Category | Notes |
 |---|---|---|---|
 | Rule-based baseline | 50% | 75% | Reads error messages well; blames any code change, harmless or not |
-| Groq `llama-3.3-70b-versatile` | _run `copilot eval --provider groq`_ | | |
+| Groq `openai/gpt-oss-120b` | _run `copilot eval --provider groq`_ | | |
 | Gemini `gemini-2.5-flash` | _run `copilot eval --provider gemini`_ | | |
 | Ollama `llama3.1:8b` (local) | _run `copilot eval --provider ollama`_ | | |
 
@@ -73,7 +73,7 @@ Diagnose a single incident:
 copilot diagnose --bundle evidence/sql_removed_tempo_filter.json --provider groq
 ```
 
-Providers can be chained for resilience (free tiers rate-limit and retire models): `--provider groq,gemini,ollama` tries each in turn. Pin a model with `groq:llama-3.1-8b-instant`.
+Providers can be chained for resilience (free tiers rate-limit and retire models): `--provider groq,gemini,ollama` tries each in turn. Pin a model with `groq:openai/gpt-oss-20b`.
 
 ### On your own dbt project
 
