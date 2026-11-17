@@ -29,13 +29,13 @@ The pipeline under test is the Spotify reference implementation from [dbt_schema
 | Approach | Fully correct | Category | Notes |
 |---|---|---|---|
 | Rule-based baseline | 50% | 75% | Reads error messages well; blames any code change, harmless or not |
-| Groq `openai/gpt-oss-120b` (free tier) | **90%** | **95%** | ~1.1 s per diagnosis; ignores harmless edits, separates bad data from bad commits |
+| Groq `openai/gpt-oss-120b` (free tier) | **80-90%** | **90-95%** | Two runs; ~1.1-1.3 s and ~1.7k tokens per diagnosis |
 | Gemini `gemini-2.5-flash` | _run `copilot eval --provider gemini`_ | | |
 | Ollama `llama3.1:8b` (local) | _run `copilot eval --provider ollama`_ | | |
 
 *Fully correct* means category, root-cause node and column all match the label. Full per-scenario reports are written to `reports/`.
 
-The LLM fixed every case where the baseline was fooled by an unrelated code edit. Its two misses are instructive: it read a failed completeness check on `popularity` as an out-of-range problem, and for a typo in a mart it reported the misspelled column instead of the intended one.
+The LLM handled every case where the baseline was fooled by an unrelated code edit. Its misses varied between runs, which is itself a finding: even at temperature 0 the same evidence does not always produce the same diagnosis. Typical misses were reading a failed completeness check or a text value in a numeric column as an out-of-range problem, missing that a removed filter (not the data) caused a failure, and reporting a misspelled or new upstream column name instead of the intended one. Repeated runs with majority voting are on the roadmap.
 
 ## Incident categories
 
@@ -118,6 +118,7 @@ The seed in `dbt_project/seeds/` is a synthetic 600-row sample with the same col
 ## Roadmap
 
 - Energy and cost per diagnosis across model sizes (local models measured with CodeCarbon), to find where a smaller model is good enough
+- Repeated runs per scenario with majority voting, to measure and reduce run-to-run variance
 - LLM-as-judge scoring for the quality of suggested fixes
 - Multi-incident scenarios and noisier logs
 - A hosted demo on Hugging Face Spaces
